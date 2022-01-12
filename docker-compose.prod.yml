@@ -1,0 +1,40 @@
+version: "3"
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.prod
+    ports:
+      - 3001:3001
+    networks:
+      - pern-network
+    restart: unless-stopped
+  client:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+    networks:
+      - pern-network
+    depends_on:
+      - server
+    restart: unless-stopped
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    networks:
+      - pern-network
+    ports:
+        - 5433:5432
+    volumes:
+        - postgres_data:/var/lib/postgresql/data/
+    environment:
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: webapp
+        POSTGRES_USER: root
+volumes:
+  postgres_data:
+networks:
+  pern-network:
+    driver: bridge
