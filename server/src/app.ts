@@ -1,11 +1,16 @@
-import express, {Application, Request, Response, NextFunction } from 'express';
+import express, { Express } from 'express';
+import {routes} from "./routes/route";
+import helmet from "helmet";
+import http from "http";
 const cors = require('cors');
 const Pool = require('pg').Pool
 
-const app: Application = express();
-app.use(express.json());
-app.use(cors());
-const PORT: string = '3001'
+const router: Express = express();
+router.use(express.json());
+router.use(express.urlencoded({ extended: false }));
+router.use(helmet());
+router.use(cors());
+
 
 const pool = new Pool({
     user: 'root',
@@ -15,11 +20,10 @@ const pool = new Pool({
     database: 'webapp'
 });
 
+router.use(routes);
 
-app.get('/', (req: Request, res: Response) => {
-    res.send({message: 'Hello World'});
-})
-
-app.listen(PORT, ()=> {
+const httpServer = http.createServer(router);
+const PORT: string = '3001'
+httpServer.listen(PORT, ()=> {
     console.log(`server running at http://localhost:${PORT}`);
 })
