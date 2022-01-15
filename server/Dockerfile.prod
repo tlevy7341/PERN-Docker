@@ -1,16 +1,19 @@
-# Pull Docker Hub base image
-FROM node:latest
-# Set working directory
-WORKDIR /usr/src/app
-# Install app dependencies
+FROM node:14-alpine3.10 as ts-compiler
+WORKDIR /usr/app
 COPY package*.json ./
+COPY tsconfig*.json ./
 RUN npm install
-# Copy app to container
-COPY . .
-# Expose port to container
-EXPOSE 3001
-
+COPY . ./
 RUN npm run build
 
-# Run the "prod" script in package.json
-CMD ["npm", "run", "start:prod"]
+FROM node:14-alpine3.10 as ts-remover
+WORKDIR /usr/app
+COPY --from=ts-compiler /usr/app/package*.json ./
+COPY --from=ts-compiler /usr/app/dist ./
+RUN npm install --only=production
+
+FROM gcr.io/distroless/nodejs:14
+WORKDIR /usr/app
+COPY --from=ts-remover /usr/app ./
+USER 1000
+CMD ["server.js"]

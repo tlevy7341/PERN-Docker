@@ -6,33 +6,27 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - 3001:3001
-    networks:
-      - pern-network
     depends_on:
       - postgres
     volumes:
-      - ./server/src:/app/src
+      - ./server/src:/usr/src/app/src
+      - ./usr/src/app/node_modules
   client:
     build: 
       context: ./client
       dockerfile: Dockerfile.dev
     ports:
       - 3000:3000
-    networks:
-      - pern-network
     volumes:
-      - ./client/src:/usr/app/src
-      - ./client/public:/usr/app/public
+      - ./client/src:/usr/src/app/src
+      - ./client/public:/usr/src/app/public
       - /usr/app/node_modules
     depends_on:
       - server
     environment:
       - CHOKIDAR_USEPOLLING=true
   postgres:
-    container_name: postgres
     image: postgres:latest
-    networks:
-      - pern-network
     ports:
         - 5433:5432
     volumes:
@@ -42,11 +36,8 @@ services:
         POSTGRES_DB: webapp
         POSTGRES_USER: root
   pgadmin:
-    container_name: pgadmin4
     image: dpage/pgadmin4
     restart: always
-    networks:
-      - pern-network
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
@@ -56,6 +47,3 @@ services:
       - postgres
 volumes:
   postgres_data:
-networks:
-  pern-network:
-    driver: bridge

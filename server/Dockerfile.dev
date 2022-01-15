@@ -1,14 +1,9 @@
-# Pull Docker Hub base image
-FROM node:latest
-# Set working directory
+FROM node:14
 WORKDIR /usr/src/app
-# Install app dependencies
 COPY package*.json ./
 RUN npm install
-# Copy app to container
 COPY . .
-# Expose port to container
+
 EXPOSE 3001
 
-# Run the "dev" script in package.json
-CMD ["npm", "run", "start"]
+CMD ["npm","run","dev"]
