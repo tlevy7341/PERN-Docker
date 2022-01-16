@@ -7,6 +7,12 @@ services:
     ports:
       - 3001:3001
     restart: unless-stopped
+    networks:
+      - backend
+    environment:
+      - db_user=${db_user}
+      - db_password=${db_password}
+      - db_host=${db_host}
   client:
     build: 
       context: ./client
@@ -16,15 +22,30 @@ services:
     depends_on:
       - server
     restart: unless-stopped
+    networks:
+      - frontend
+      - backend
   postgres:
     image: postgres:latest
     ports:
         - 5433:5432
+    restart: unless-stopped
     volumes:
         - postgres_data:/var/lib/postgresql/data/
     environment:
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: webapp
-        POSTGRES_USER: root
+        POSTGRES_DB=${db_name}
+        POSTGRES_PASSWORD=${db_user}
+        POSTGRES_USER=${db_password}
+    networks:
+      - db
+      - backend
 volumes:
   postgres_data:
+networks:
+    frontend:
+        driver: bridge
+    backend:
+        driver: bridge
+    db:
+        driver: bridge
+        internal: true

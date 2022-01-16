@@ -13,11 +13,11 @@ router.use(cors());
 
 
 const pool = new Pool({
-    user: 'root',
-    password: 'password',
-    host: 'postgres',
+    user: process.env.db_user,
+    password: process.env.db_password,
+    host: process.env.db_host,
     port: 5432,
-    database: 'webapp'
+    database: process.env.db_name
 });
 
 router.use(routes);
